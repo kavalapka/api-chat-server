@@ -1,4 +1,4 @@
-# NodeJS API server for chatterbox application based on https://github.com/auth0/nodejs-jwt-authentication-sample
+# NodeJS API server for chatterbox application based on [nodejs-jwt-authentication-sample]( https://github.com/auth0/nodejs-jwt-authentication-sample)
 
 ## Running it
 
@@ -8,6 +8,7 @@ Just clone the repository, run `npm install` and then `node server.js`.
 
 will be here
 
+_______________________________________________________________________________
 
 # NodeJS JWT Authentication sample
 
