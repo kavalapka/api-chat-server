@@ -1,12 +1,39 @@
 # NodeJS API server for chatterbox application based on [nodejs-jwt-authentication-sample]( https://github.com/auth0/nodejs-jwt-authentication-sample)
 
+## Description
+
+It is API for [ChatterBox](https://github.com/kavalapka/chatterbox) application. 
+
+Inside you can find message searching function with 2 implementation:
+simple filter function and function based on Red-Black Tree structure.
+Also you can measure function running time.
+
 ## Running it
 
 Just clone the repository, run `npm install` and then `node server.js`.
 
 ## Available APIs
 
-will be here
+### Create amount of test messages
+
+#### POST `/api/message/create?num=Number`
+
+It creates messages with timestamps from 1 to Number
+
+### List available messages
+
+All messages:
+#### GET `/api/message/list` 
+
+Messages after last timestamp:
+#### GET `/api/message/list?timestamp=1456651674675`
+
+
+### Post new message
+
+#### POST `/api/message/send?timestamp=1456651674675&msg=Hi%20all&user=Vasya`
+
+It will create new message with params: user="Vasya", msg="Hi all", timestamp=1456651674675
 
 _______________________________________________________________________________
 

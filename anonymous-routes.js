@@ -50,6 +50,7 @@ app.get('/api/message/list', function(req, res) {
 app.post('/api/message/send', function(req, res){
     var message = req.body;
     msg.push(message);
+    tree = tree.insert(message.timestamp, message);
     res.status(201).send(message)
 });
 
@@ -81,4 +82,4 @@ var createMsgs = function (num) {
         }
     }
 };
-createMsgs(7);
+
