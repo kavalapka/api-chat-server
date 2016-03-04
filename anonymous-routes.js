@@ -1,61 +1,50 @@
 var express = require('express'),
     quoter  = require('./quoter'),
-    messenger = require('./messenger');
+    RBTree = require("functional-red-black-tree");
+
 
 var app = module.exports = express.Router();
-var msg = [
-  {
-    "user": "Olga",
-    "msg": "Hi!",
-    "timestamp": 1456651674675
-  },
-  {
-    "user": "Vasya",
-    "msg": "Hello!",
-    "timestamp": 1456651694675
-  },
-  {
-    "user": "Olga",
-    "msg": "How are you?",
-    "timestamp": 1456651784675
-  },
-  {
-    "user": "Olga",
-    "msg": "Where are you?",
-    "timestamp": 1456651814675
-  },
-  {
-    "user": "Vasya",
-    "msg": "Here!",
-    "timestamp": 1456651674675
-  },
-  {
-    "user": "Olga",
-    "msg": "Where? Where? Where? Where? Where? Where? Where? Where? Where? Where? Where? Where? Where? Where? Where?",
-    "timestamp": 1456651674675
-  },
-  {
-    "user": "Vasya",
-    "msg": "In front of you! Wait a minute!",
-    "timestamp": 1456651674675
-  }
-];
 
 app.get('/api/random-quote', function(req, res) {
   res.status(200).send(quoter.getRandomOne());
 });
 
-app.get('/api/message/list', function(req, res){
-    var ts = req.query.timestamp || 0;
-    //istMsg();
-    console.log('Message list time: ' + bench(listMsg) + 'ms' );
-    function listMsg() {
-        var out = msg.filter(function (item) {
-            return item.timestamp > ts
-        });
-        res.status(200).send(out)
-    }
+var msg = [];
+var lastTimestamp;
+var tree = RBTree(function(a, b) { return a - b; });
 
+function listMsg(lastTimestamp) {
+    var out = msg.filter(function (item) {
+        return item.timestamp > lastTimestamp
+    });
+    return out;
+}
+
+function listByTree(lastTimestamp){
+    var out = [];
+    var it = tree.gt(lastTimestamp);
+    while(it.node !== null) {
+        out.push(it.node.value);
+        it.next();
+    }
+    return out;
+}
+
+app.get('/api/message/list', function(req, res) {
+    lastTimestamp = req.query.timestamp || 0;
+    //uncomment to use search by filter
+    /*var time = process.hrtime();
+    var out = listMsg(lastTimestamp);
+    console.log('RBTree: Message list time: '
+        + process.hrtime(time)[1] / 1e6 + 'ms');
+*/
+    //uncomment to use search by RBtree
+    var time = process.hrtime();
+    var out = listByTree(lastTimestamp);
+    console.log('RBTree: Message list time: '
+        + process.hrtime(time)[1] / 1e6 + 'ms');
+
+    res.status(200).send(out);
 });
 
 app.post('/api/message/send', function(req, res){
@@ -67,13 +56,12 @@ app.post('/api/message/send', function(req, res){
 app.post('/api/message/create', function(req, res){
     var amount = req.body.num;
     createMsgs(amount);
-    console.log('MSG length', msg.length);
-
-    res.status(201).send(amount)
+    res.status(201).send('Created, msg: ' + amount)
 });
 
-function createMsgs(num) {
-    for (var i = 0; i < num; i++) {
+
+var createMsgs = function (num) {
+    for (var i = 1; i <= num; i++) {
         var mess = {};
         if (i % 2 === 0) {
             mess.user = "Olga";
@@ -85,10 +73,12 @@ function createMsgs(num) {
         mess.timestamp = i;
         msg.push(mess);
     }
-}
 
-function bench(f) {
-  var date = new Date();
-      f();
-  return new Date() - date;
-}
+    tree = RBTree(function(a, b) { return a - b; });
+    if(msg.length > 0) {
+        for (var a in msg) {
+            tree = tree.insert(msg[a].timestamp, msg[a]);
+        }
+    }
+};
+createMsgs(7);
