@@ -47,10 +47,15 @@ app.get('/api/random-quote', function(req, res) {
 
 app.get('/api/message/list', function(req, res){
     var ts = req.query.timestamp || 0;
-    var out = msg.filter(function(item){
-        return item.timestamp > ts
-    });
-   res.status(200).send(out)
+    //istMsg();
+    console.log('Message list time: ' + bench(listMsg) + 'ms' );
+    function listMsg() {
+        var out = msg.filter(function (item) {
+            return item.timestamp > ts
+        });
+        res.status(200).send(out)
+    }
+
 });
 
 app.post('/api/message/send', function(req, res){
@@ -58,3 +63,32 @@ app.post('/api/message/send', function(req, res){
     msg.push(message);
     res.status(201).send(message)
 });
+
+app.post('/api/message/create', function(req, res){
+    var amount = req.body.num;
+    createMsgs(amount);
+    console.log('MSG length', msg.length);
+
+    res.status(201).send(amount)
+});
+
+function createMsgs(num) {
+    for (var i = 0; i < num; i++) {
+        var mess = {};
+        if (i % 2 === 0) {
+            mess.user = "Olga";
+            mess.msg = "I am Olga";
+        } else {
+            mess.user = "Vasya";
+            mess.msg = "I am Vasya";
+        }
+        mess.timestamp = i;
+        msg.push(mess);
+    }
+}
+
+function bench(f) {
+  var date = new Date();
+      f();
+  return new Date() - date;
+}
