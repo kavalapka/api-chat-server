@@ -35,7 +35,7 @@ Messages after last timestamp:
 
 It will create new message with params: user="Vasya", msg="Hi all", timestamp=1456651674675
 
-_______________________________________________________________________________
+_____________________________________________________________________________
 
 # NodeJS JWT Authentication sample
 
