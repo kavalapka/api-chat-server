@@ -39,10 +39,9 @@ app.get('/api/message/list', function(req, res) {
         + process.hrtime(time)[1] / 1e6 + 'ms');
 */
     //uncomment to use search by RBtree
-    var time = process.hrtime();
+    //var time = process.hrtime();
     var out = listByTree(lastTimestamp);
-    console.log('RBTree: Message list time: '
-        + process.hrtime(time)[1] / 1e6 + 'ms');
+    //console.log('RBTree: Message list time: '+ process.hrtime(time)[1] / 1e6 + 'ms');
 
     res.status(200).send(out);
 });
@@ -51,6 +50,9 @@ app.post('/api/message/send', function(req, res){
     var message = req.body;
     msg.push(message);
     tree = tree.insert(message.timestamp, message);
+    setTimeout(function(){
+        createMsgs(1)
+    }, 2000);
     res.status(201).send(message)
 });
 
@@ -62,16 +64,22 @@ app.post('/api/message/create', function(req, res){
 
 
 var createMsgs = function (num) {
+    var tstamp = 0;
+    if(msg[msg.length-1]){
+        tstamp = msg[msg.length-1].timestamp;
+    }
+
+
     for (var i = 1; i <= num; i++) {
         var mess = {};
+        mess.timestamp = tstamp +i;
         if (i % 2 === 0) {
             mess.user = "Olga";
-            mess.msg = "I am Olga";
+            mess.msg = quoter.getRandomOne();
         } else {
             mess.user = "Vasya";
-            mess.msg = "I am Vasya";
+            mess.msg = quoter.getRandomOne();
         }
-        mess.timestamp = i;
         msg.push(mess);
     }
 
@@ -82,4 +90,5 @@ var createMsgs = function (num) {
         }
     }
 };
+createMsgs(1);
 
